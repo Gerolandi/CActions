@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  build-linux:
 
     runs-on: ubuntu-latest
 
@@ -24,3 +24,7 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Publish on linux-x64
+      run: dotnet publish CActions/CActions.csproj -c Release -r linux-x64 -o ../linux-x64-publish 
+      
+      
