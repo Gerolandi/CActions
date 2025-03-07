@@ -27,4 +27,21 @@ jobs:
     - name: Publish on linux-x64
       run: dotnet publish CActions/CActions.csproj -c Release -r linux-x64 -o ../linux-x64-publish 
       
+
+    - name: Install rclone for artifact deploy
+      run: |
+        curl -O https://downloads.rclone.org/rclone-current-linux-amd64.deb
+        sudo dpkg -i rclone-current-linux-amd64.deb
+
+    - name: Configure rclone
+      run: |
+        mkdir -p ~/.config/rclone
+        echo "[b2]" >> ~/.config/rclone/rclone.conf
+        echo "type = b2" >> ~/.config/rclone/rclone.conf
+        echo "account = ${{ secrets.B2_ACCOUNT_ID }}" >> ~/.config/rclone/rclone.conf
+        echo "key = ${{ secrets.B2_APPLICATION_KEY }}" >> ~/.config/rclone/rclone.conf
+
+    - name: Upload to Backblaze B2
+      run: |
+        rclone copy ./publish b2:${{ secrets.B2_BUCKET_NAME }}/linux-publish
       
