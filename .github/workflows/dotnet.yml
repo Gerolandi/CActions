@@ -27,6 +27,11 @@ jobs:
     - name: Publish on linux-x64
       run: dotnet publish CActions/CActions.csproj -c Release -r linux-x64 -o ./publish 
       
+    - name: Delete debug files
+      run: rm ./publish/*.dbg
+      
+    
+      
 
     - name: Install rclone for artifact deploy
       run: |
@@ -42,3 +47,5 @@ jobs:
       run: |
         rclone copy ./publish b2:${{ vars.B2_BUCKET_NAME }}/linux-publish/
       
+  build-windows:
+    
