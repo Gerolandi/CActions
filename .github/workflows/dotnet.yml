@@ -40,8 +40,8 @@ jobs:
         echo "type = b2" >> ~/.config/rclone/rclone.conf
         echo "account = ${{ secrets.B2_ACCOUNT_ID }}" >> ~/.config/rclone/rclone.conf
         echo "key = ${{ secrets.B2_APPLICATION_KEY }}" >> ~/.config/rclone/rclone.conf
-
+    
     - name: Upload to Backblaze B2
       run: |
-        rclone copy ./publish b2:${{ vars.B2_BUCKET_NAME }}/linux-publish
+        rclone copy ./publish b2:${{ vars.B2_BUCKET_NAME }}/linux-publish/
       
