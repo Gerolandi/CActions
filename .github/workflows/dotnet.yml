@@ -15,34 +15,66 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x
-        
-    - name: Install workload for android building
-      run: dotnet workload install android
-      
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore --configuration Release
-    - name: Publish android apk
-      run:  dotnet publish SuperApp/SuperApp.Android/SuperApp.Android.csproj -c Release -o ./publish       
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
-    - name: Install rclone for artifact deploy
-      run: |
-        curl -O https://downloads.rclone.org/rclone-current-linux-amd64.deb
-        sudo dpkg -i rclone-current-linux-amd64.deb
+      - name: Install workload for android building
+        run: dotnet workload install android
 
-    - name: Configure rclone
-      run: |
-        mkdir -p ~/.config/rclone
-        echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
-    
-    - name: Upload to Backblaze B2
-      run: |
-        rclone copy ./publish/*-Signed.apk b2:${{ vars.B2_BUCKET_NAME }}/apk/
-      
-    
+      - name: Restore dependencies
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+      - name: Publish android apk
+        run: dotnet publish SuperApp/SuperApp.Android/SuperApp.Android.csproj -c Release -o ./publish
+
+      - name: Install rclone for artifact deploy
+        run: |
+          curl -O https://downloads.rclone.org/rclone-current-linux-amd64.deb
+          sudo dpkg -i rclone-current-linux-amd64.deb
+
+      - name: Configure rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
+
+      - name: Upload to Backblaze B2
+        run: |
+          rclone copy ./publish/*-Signed.apk b2:${{ vars.B2_BUCKET_NAME }}/apk/
+  
+  build-browser:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install workload for wasm building
+        run: dotnet workload install wasm-tools
+
+      - name: Restore dependencies
+        run:  dotnet restore SuperApp/SuperApp.Browser/SuperApp.Browser.csproj
+      - name: Build
+        run: dotnet build SuperApp/SuperApp.Browser/SuperApp.Browser.csproj --no-restore --configuration Release 
+      - name: Publish android apk
+        run:  dotnet publish SuperApp/SuperApp.Browser/SuperApp.Browser.csproj -c Release -o ./wasm
+
+      - name: Install rclone for artifact deploy
+        run: |
+          curl -O https://downloads.rclone.org/rclone-current-linux-amd64.deb
+          sudo dpkg -i rclone-current-linux-amd64.deb
+
+      - name: Configure rclone
+        run: |
+          mkdir -p ~/.config/rclone
+          echo "${{ secrets.RCLONE_CONF }}" > ~/.config/rclone/rclone.conf
+
+      - name: Upload to Backblaze B2
+        run: |
+          rclone copy ./wasm/wwwroot b2:${{ vars.B2_BUCKET_NAME }}/website/
