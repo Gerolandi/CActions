@@ -43,5 +43,5 @@ jobs:
 
     - name: Upload to Backblaze B2
       run: |
-        rclone copy ./publish b2:${{ secrets.B2_BUCKET_NAME }}/linux-publish
+        rclone copy ./publish b2:${{ vars.B2_BUCKET_NAME }}/linux-publish
       
