@@ -25,7 +25,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: Publish on linux-x64
-      run: dotnet publish CActions/CActions.csproj -c Release -r linux-x64 -o ../linux-x64-publish 
+      run: dotnet publish CActions/CActions.csproj -c Release -r linux-x64 -o ./publish 
       
 
     - name: Install rclone for artifact deploy
